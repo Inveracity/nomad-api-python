@@ -8,4 +8,4 @@ services:
       - 4646:4646
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-      - ${PWD}/nomadconfig.hcl:/etc/nomad.d/config.hcl:ro
+      - ${PWD}/nomad/nomadconfig.hcl:/etc/nomad.d/config.hcl:ro

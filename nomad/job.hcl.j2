@@ -1,0 +1,41 @@
+job "{{ name }}" {
+  datacenters = ["{{ datacenter }}"]
+  type        = "service"
+  namespace   = "default"
+
+  group "{{ name }}" {
+    count = 1
+
+    network {
+      port "http" {
+        to = {{ port }}
+      }
+    }
+
+    service {
+      name     = "{{ name }}"
+      provider = "nomad"
+      port     = "http"
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.{{ name }}.rule=Host(`{{ name }}.christopherbaklid.com`)",
+        "traefik.http.routers.{{ name }}.entrypoints=websecure",
+        "traefik.http.routers.{{ name }}.tls.certresolver=myresolver",
+        "traefik.http.routers.{{ name }}.tls=true",
+      ]
+    }
+
+    task "server" {
+      driver = "docker"
+
+      config {
+        image = "{{ image }}"
+        ports = ["http"]
+      }
+      resources {
+        cpu    = 100
+        memory = 50
+      }
+    }
+  }
+}
