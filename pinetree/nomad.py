@@ -1,10 +1,11 @@
 import os
 from pathlib import Path
+from typing import List
 
 import jinja2
 from httpx import Client
 
-from pinetree.models import JobJson, JobVars, RenderedTemplate
+from pinetree.models import Alloc, JobJson, JobVars, RenderedTemplate
 
 NOMAD_TOKEN = os.environ.get("NOMAD_TOKEN")
 NOMAD_ADDR = os.environ.get("NOMAD_ADDR")
@@ -14,7 +15,6 @@ client = Client(headers={"X-Nomad-Token": NOMAD_TOKEN})
 
 def _parse(job: RenderedTemplate) -> JobJson:
     """Convert job HCL string to JSON"""
-    print(job)
     resp = client.post(
         f"{NOMAD_ADDR}/v1/jobs/parse",
         json={
@@ -25,22 +25,12 @@ def _parse(job: RenderedTemplate) -> JobJson:
     return resp.json()
 
 
-def get(_id: str):
-    """Get job details"""
-    response = client.get(
-        f"{NOMAD_ADDR}/v1/job/{_id}",
-    )
-
-    print(response.json())
-
-
-def get_all() -> dict:
+def get_all() -> List[Alloc]:
     """Get job details"""
     response = client.get(
         f"{NOMAD_ADDR}/v1/jobs",
     )
-
-    return response.json()
+    return [Alloc(**x) for x in response.json()]
 
 
 def deploy(job: JobJson) -> dict:
@@ -54,7 +44,6 @@ def deploy(job: JobJson) -> dict:
     }
 
     response = client.post(f"{NOMAD_ADDR}/v1/jobs", json=register_job_as_dict)
-    print(response.content)
     return response.json()
 
 
