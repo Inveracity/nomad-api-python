@@ -14,6 +14,7 @@ client = Client(headers={"X-Nomad-Token": NOMAD_TOKEN})
 
 def _parse(job: RenderedTemplate) -> JobJson:
     """Convert job HCL string to JSON"""
+    print(job)
     resp = client.post(
         f"{NOMAD_ADDR}/v1/jobs/parse",
         json={

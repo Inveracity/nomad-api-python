@@ -23,10 +23,12 @@ def deploy_container():
             port=st.session_state["port"],
             datacenter=st.session_state["datacenter"],
         )
+        print(job_vars)
         job_payload = nomad.job_create(job_vars=job_vars)
-        print(job_payload)
+        # print(job_payload)
         resp = nomad.deploy(job_payload)
+        print(resp)
 
-    st.write(resp)
+    # st.write(resp)
     name = "-".join(st.session_state["name"].split())
     st.success(f"Deployed {st.session_state['image']} to https://{name}.christopherbaklid.com")

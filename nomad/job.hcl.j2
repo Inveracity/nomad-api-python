@@ -18,10 +18,8 @@ job "{{ name }}" {
       port     = "http"
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.{{ name }}.rule=Host(`{{ name }}.christopherbaklid.com`)",
-        "traefik.http.routers.{{ name }}.entrypoints=websecure",
-        "traefik.http.routers.{{ name }}.tls.certresolver=myresolver",
-        "traefik.http.routers.{{ name }}.tls=true",
+        "traefik.http.routers.{{ name }}.rule=PathPrefix(`/{{ name }}`)",
+        "traefik.http.routers.{{ name }}.entrypoints=web",
       ]
     }
 

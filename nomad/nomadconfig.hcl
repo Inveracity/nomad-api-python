@@ -1,5 +1,5 @@
 datacenter = "dc1"
-data_dir   = "/var/lib/nomad"
+data_dir   = "/nomad/data/"
 bind_addr  = "0.0.0.0"
 
 acl {
