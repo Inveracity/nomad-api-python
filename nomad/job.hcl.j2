@@ -1,0 +1,39 @@
+job "{{ name }}" {
+  datacenters = ["{{ datacenter }}"]
+  type        = "service"
+  namespace   = "default"
+
+  group "{{ name }}" {
+    count = 1
+
+    network {
+      port "http" {
+        to = {{ port }}
+      }
+    }
+
+    service {
+      name     = "{{ name }}"
+      provider = "nomad"
+      port     = "http"
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.{{ name }}.rule=PathPrefix(`/{{ name }}`)",
+        "traefik.http.routers.{{ name }}.entrypoints=web",
+      ]
+    }
+
+    task "server" {
+      driver = "docker"
+
+      config {
+        image = "{{ image }}"
+        ports = ["http"]
+      }
+      resources {
+        cpu    = 100
+        memory = 50
+      }
+    }
+  }
+}

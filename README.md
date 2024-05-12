@@ -2,6 +2,10 @@
 
 Playing around with the Nomad http API
 
+## Requirements
+
+- [Nomad](https://christopherbaklid.com/posts/nomad/)
+- [Traefik](https://christopherbaklid.com/posts/traefik/)
 
 ## Setup
 
