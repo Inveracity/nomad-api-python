@@ -3,8 +3,7 @@ import os
 from pathlib import Path
 
 import jinja2
-from httpx import AsyncClient
-
+from httpx import Client
 
 RenderedTemplate = str
 JobJson = dict
@@ -13,18 +12,18 @@ NOMAD_TOKEN = os.environ.get("NOMAD_TOKEN")
 NOMAD_ADDR = os.environ.get("NOMAD_ADDR")
 
 
-async def main():
-    client = AsyncClient(headers={"X-Nomad-Token": NOMAD_TOKEN})
+def main():
+    client = Client(headers={"X-Nomad-Token": NOMAD_TOKEN})
 
-    job = await parse(client, render_template())
-    await deploy(client, job)
-    await get(client, "test")
-    await client.aclose()
+    job = parse(client, render_template())
+    deploy(client, job)
+    get(client, "test")
+    client.close()
 
 
-async def parse(client: AsyncClient, job: RenderedTemplate) -> JobJson:
+def parse(client: Client, job: RenderedTemplate) -> JobJson:
     """Convert job HCL string to JSON"""
-    resp = await client.post(
+    resp = client.post(
         f"{NOMAD_ADDR}/v1/jobs/parse",
         json={
             "JobHCL": job,
@@ -34,16 +33,16 @@ async def parse(client: AsyncClient, job: RenderedTemplate) -> JobJson:
     return resp.json()
 
 
-async def get(client: AsyncClient, _id: str):
+def get(client: Client, _id: str):
     """Get job details"""
-    response = await client.get(
+    response = client.get(
         f"{NOMAD_ADDR}/v1/job/{_id}",
     )
 
     print(response.json())
 
 
-async def deploy(client: AsyncClient, job: JobJson):
+def deploy(client: Client, job: JobJson):
 
     register_job_as_dict = {
         "EnforceIndex": False,
@@ -53,7 +52,7 @@ async def deploy(client: AsyncClient, job: JobJson):
         "Job": job,
     }
 
-    response = await client.post(f"{NOMAD_ADDR}/v1/jobs", json=register_job_as_dict)
+    response = client.post(f"{NOMAD_ADDR}/v1/jobs", json=register_job_as_dict)
 
     print(response.json())
 
@@ -64,6 +63,7 @@ def render_template() -> RenderedTemplate:
     job_vars = {
         "job": {
             "name": "test",
+            "datacenter": "dc1",
             "image": "traefik/whoami:latest",
             "port": "80",
         },
@@ -73,4 +73,4 @@ def render_template() -> RenderedTemplate:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

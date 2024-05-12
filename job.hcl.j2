@@ -1,5 +1,5 @@
 job "{{ job['name'] }}" {
-  datacenters = ["linode"]
+  datacenters = ["{{ job['datacenter'] }}"]
   type        = "service"
   namespace   = "default"
 
